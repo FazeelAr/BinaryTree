@@ -133,61 +133,134 @@ public:
 	}
 	bool deleteNode(T val)
 	{
-		/*if (root->data == val)
-		{
-			delete root;
-			root = nullptr;
-			return true;
-		}*/
-		Node* iter = root, * prev = root;
-		bool flag = false;
+		Node* iter = root, * prev = nullptr;
+
+		// Step 1: Search for the node to delete
 		while (iter != nullptr && iter->data != val)
+		{
+			prev = iter;
+			if (val < iter->data)
+				iter = iter->left;
+			else
+				iter = iter->right;
+		}
+
+		// If the node is not found
+		if (iter == nullptr) return false;
+
+		// Step 2: Node with no children (leaf node)
+		if (iter->left == nullptr && iter->right == nullptr)
+		{
+			if (prev == nullptr) // Node to delete is the root
+				root = nullptr;
+			else if (prev->left == iter)
+				prev->left = nullptr;
+			else
+				prev->right = nullptr;
+
+			delete iter;
+		}
+
+		// Step 3: Node with one child
+		else if (iter->left == nullptr || iter->right == nullptr)
+		{
+			Node* child = (iter->left != nullptr) ? iter->left : iter->right;
+
+			if (prev == nullptr) // Node to delete is the root
+				root = child;
+			else if (prev->left == iter)
+				prev->left = child;
+			else
+				prev->right = child;
+
+			delete iter;
+		}
+
+		// Step 4: Node with two children
+		else
+		{
+			// Find inorder successor (smallest in the right subtree)
+			Node* successor = iter->right, * successorParent = iter;
+			while (successor->left != nullptr)
+			{
+				successorParent = successor;
+				successor = successor->left;
+			}
+
+			// Copy the successor's data to the current node
+			iter->data = successor->data;
+
+			// Delete the successor
+			if (successorParent->left == successor)
+				successorParent->left = successor->right;
+			else
+				successorParent->right = successor->right;
+
+			delete successor;
+		}
+
+		return true;
+	}
+	T floor(T val)
+	{
+		if (nullptr == root)
+		{
+			throw "\nTree is Empty";
+		}
+		if (root->data == val)
+		{
+			return root->data;
+		}
+
+		Node* iter = root;
+		T last = -1;
+		while (iter != nullptr && root->data != val)
 		{
 			if (iter->data > val)
 			{
-				prev = iter;
 				iter = iter->left;
+			}
+			else
+			{
+				last = iter->data;
+				iter = iter->right;
+			}
+		}
+		if (iter->data == val)
+		{
+			return iter->data;
+		}
+		return last;
+	}
+	T ceil(T val)
+	{
+		if (nullptr == root)
+		{
+			throw "\nTree is Empty";
+		}
+		if (root->data == val)
+		{
+			return root->data;
+		}
+		Node* iter = root;
+		T retVal = -1;
+		while (iter != nullptr)
+		{
+			if (iter->data == val)
+			{
+				return iter->data;
 			}
 			else if (iter->data < val)
 			{
-				prev = iter;
 				iter = iter->right;
 			}
 			else
 			{
-				flag = true;
-			}
-		}
-		cout << "\ndata to be deleted: " << iter->data << '\n';
-		if (iter == nullptr)
-		{
-			if (prev->left == nullptr && prev->right == nullptr)
-			{
-				delete prev;
-			}
-			else if (prev->left == nullptr && prev->right != nullptr)
-			{
-				prev->right = iter->right;
-				delete iter;
-			}
-			else if (prev->left != nullptr && prev->right == nullptr)
-			{
-				prev->left = iter->left;
-				delete iter;
-			}
-			else
-			{
+				retVal = iter->data;
 				iter = iter->left;
-				while (iter->right != nullptr)
-				{
-					iter = iter->right;
-				}
-				prev->data = iter->data;
-				delete iter;
 			}
-			return true;
 		}
-		return false;
+		return retVal;
 	}
 };
 #endif //BSTREE_H;
