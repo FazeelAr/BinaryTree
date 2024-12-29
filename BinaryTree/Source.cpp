@@ -33,7 +33,7 @@ int main()
 	cout << '\n' << tree.searchNode(1)<<"\nLevelOrder: ";
 	tree.levelOrder();
 	cout << "\nHeight: " << tree.getHeight(tree.getRoot());
-	//tree.~BinaryTree();
+	tree.~BinaryTree();
 	//BSTree<int> tree{};
 	//tree.insert(1);
 	//tree.insert(2);
@@ -48,6 +48,6 @@ int main()
 	//tree.inOrderTrav();
 	////cout << '\n' << tree.search(8);
 	////cout << '\n' << tree.deleteNode(tree.getRoot(),6) << '\n';
-	//cout << '\n' << tree.ceil(9) << '\n';
+	//cout << '\n' << tree.floor(6) << '\n';
 	//tree.inOrderTrav();
 }

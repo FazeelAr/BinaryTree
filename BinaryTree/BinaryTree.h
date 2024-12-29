@@ -1,9 +1,11 @@
 #ifndef BINARY_TREE_H
 #define BINARY_TREE_H
-#include<iostream>
+
+#include <iostream>
+#include <queue>
 using namespace std;
-#include<queue>
-template<typename T>
+
+template <typename T>
 class BinaryTree
 {
 public:
@@ -12,15 +14,15 @@ public:
 		T data;
 		Node* left;
 		Node* right;
+
 		Node(T dt, Node* l = nullptr, Node* r = nullptr)
-		{
-			data = dt;
-			left = l;
-			right = r;
+			: data(dt), left(l), right(r) {
 		}
 	};
+
 private:
 	Node* root;
+
 	void inOrder(Node* node)
 	{
 		if (node == nullptr)
@@ -113,12 +115,47 @@ private:
 		delete node;
 		node = nullptr;
 	}
-public:
-	BinaryTree()
+	bool equal(Node* p, Node* q)
 	{
-		root = nullptr;
+		if (p == nullptr && q == nullptr)
+		{
+			return true;
+		}
+		if (p == nullptr || q == nullptr)
+		{
+			return false;
+		}
+		if (p->data == q->data)
+		{
+			return equal(p->left, q->left) && equal(p->right, q->right);
+		}
+		return false;
 	}
-	
+	int balance(Node* node)
+	{
+		if (node == nullptr)
+		{
+			return false;
+		}
+		int left = balance(root->left);
+		if (left == -1)
+		{
+			return -1;
+		}
+		int right = balance(node->right);
+		if (right == -1)
+		{
+			return -1;
+		}
+		if (abs(left - right) > 1)
+		{
+			return -1;
+		}
+		return left > right ? left + 1 : right + 1;
+	}
+
+public:
+	BinaryTree() : root(nullptr) {}
 	~BinaryTree()
 	{
 		if (!root)
@@ -136,11 +173,11 @@ public:
 	}
 	void postOrderTrav()
 	{
-		postOrder(root);
+		postOrder();
 	}
 	void preOrderTrav()
 	{
-		preOrder(root);
+		preOrder();
 	}
 	void insertNode(T data)
 	{
@@ -178,7 +215,6 @@ public:
 			}
 		}
 	}
-	
 	bool searchNode(T val)
 	{
 		return search(root, val) == nullptr ? false : true;
@@ -186,7 +222,7 @@ public:
 	bool removeNode(T key)
 	{
 		Node* rem = parent(root, key);
-		if (rem != nullptr && rem->left->data==key)
+		if (rem != nullptr && rem->left->data == key)
 		{
 			deleteTree(rem->left);
 			rem->left = nullptr;
@@ -200,8 +236,7 @@ public:
 		}
 		return false;
 	}
-	// Function to delete a node from the binary tree
-	Node* deleteNode(Node* root, int val) 
+	Node* deleteNode(Node* root, T val)
 	{
 		if (root == nullptr) return nullptr;
 		// Use a queue to perform BFS
@@ -210,13 +245,13 @@ public:
 		Node* target = nullptr;
 
 		// Find the target node
-		while (!q.empty()) 
+		while (!q.empty())
 		{
 			Node* curr = q.front();
 			q.pop();
 
 			// Check for current node is the target node to delete
-			if (curr->data == val) 
+			if (curr->data == val)
 			{
 				target = curr;
 				break;
@@ -239,7 +274,7 @@ public:
 		queue<pair<Node*, Node*>> q1;
 		q1.push({ root, nullptr });
 
-		while (!q1.empty()) 
+		while (!q1.empty())
 		{
 			auto curr = q1.front();
 			q1.pop();
@@ -260,15 +295,15 @@ public:
 		target->data = lastNode->data;
 
 		// Remove the last node
-		if (lastParent) 
+		if (lastParent)
 		{
 			if (lastParent->left == lastNode)
 				lastParent->left = nullptr;
-			else 
+			else
 				lastParent->right = nullptr;
 			delete lastNode;
 		}
-		else 
+		else
 		{
 			// If the last node was the root
 			delete lastNode;
@@ -313,5 +348,18 @@ public:
 		int rightHeight = getHeight(node->right);
 		return leftHeight > rightHeight ? leftHeight + 1 : rightHeight + 1;
 	}
+	bool isEqual(Node* other)
+	{
+		return equal(root, other);
+	}
+	bool isBalanced()
+	{
+		if (root == nullptr)
+		{
+			return false;
+		}
+		return balance(root) != -1;
+	}
 };
+
 #endif // !BINARY_TREE_H
