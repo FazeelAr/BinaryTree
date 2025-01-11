@@ -2,6 +2,8 @@
 #define BSTREE_H
 #include<iostream>
 using namespace std;
+#include<vector>
+#include<queue>
 template<typename T>
 class BSTree
 {
@@ -20,6 +22,7 @@ public:
 	};
 private:
 	Node* root;
+	Node* insertRec(Node*& node, T val);
 	void inOrder(Node* node);
 	void preOrder(Node* node);
 	void postOrder(Node* node);
@@ -27,7 +30,12 @@ private:
 	int balance(Node* node);
 	bool isMirror(Node* p, Node* q);
 public:
+	Node* getRoot()
+	{
+		return root;
+	}
 	void insert(T val);
+	void recInsert(T val);
 	void inOrderTrav();
 	void postOrderTrav();
 	void preOrderTrav();
@@ -41,6 +49,28 @@ public:
 	~BSTree();
 	bool isSymmetric(Node* root);
 };
+template<typename T>
+struct BSTree<T>::Node* BSTree<T>::insertRec(Node*& node, T val)
+{
+	if (node == nullptr)
+	{
+		return new Node(val);
+	}
+	else if (node->data > val)
+	{
+		node->left = insertRec(node->left, val);
+	}
+	else if(node->data < val)
+	{
+		node->right = insertRec(node->right, val);
+	}
+	return node;
+}
+template<typename T>
+void BSTree<T>::recInsert(T val)
+{
+	root = insertRec(root,val);
+}
 template<typename T>
 void BSTree<T>::inOrder(Node* node)
 {
@@ -85,8 +115,13 @@ void BSTree<T>::insert(T val)
 	}
 	Node* iter = root, * prev = root;
 	bool flag = false;
-	while (iter != nullptr && flag == false)
+	while (iter != nullptr)
 	{
+		if (iter->data == val)
+		{
+			iter->left = new Node{ val,iter->left,iter->right };
+			return;
+		}
 		if (iter->data < val)
 		{
 			prev = iter;
@@ -97,24 +132,18 @@ void BSTree<T>::insert(T val)
 			prev = iter;
 			iter = iter->left;
 		}
-		else
-		{
-			flag = true;
-		}
 	}
-	if (iter == nullptr && flag == false)
+	if (prev->data < val)
 	{
-		if (prev->data < val)
-		{
-			prev->right = new Node{ val };
-		}
-		else
-		{
-			prev->left = new Node{ val };
-		}
-		return;
+		prev->right = new Node{ val };
 	}
-	cout << "\nduplicate Node";
+	else
+	{
+		prev->left = new Node{ val };
+	}
+	return;
+	
+	//cout << "\nduplicate Node";
 }
 template<typename T>
 void BSTree<T>::inOrderTrav()
